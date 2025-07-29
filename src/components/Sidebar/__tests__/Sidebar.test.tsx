@@ -1,22 +1,20 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import "@testing-library/jest-dom";
+import { render, screen, fireEvent } from "../../../test-utils";
 import Sidebar from "../index";
+import {
+  createMockEmailCounts,
+  mockFunctions,
+  setupTestEnvironment,
+} from "../../../test-utils";
 
 describe("Sidebar", () => {
+  setupTestEnvironment();
+
   const defaultProps = {
     selectedMailbox: "inbox",
-    setSelectedMailbox: jest.fn(),
-    emailCountByBox: {
-      inbox: 5,
-      spam: 2,
-      trash: 0,
-    },
-    setSelectedEmail: jest.fn(),
+    setSelectedMailbox: mockFunctions.setSelectedMailbox,
+    emailCountByBox: createMockEmailCounts(),
+    setSelectedEmail: mockFunctions.setSelectedEmail,
   };
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
 
   describe("Rendering", () => {
     it("should render sidebar with navigation items", () => {
@@ -33,7 +31,7 @@ describe("Sidebar", () => {
       render(<Sidebar {...defaultProps} />);
 
       expect(screen.getByText("5")).toBeInTheDocument();
-      expect(screen.getByText("2")).toBeInTheDocument();
+      expect(screen.getByText("1")).toBeInTheDocument();
     });
 
     it("should not render count for trash when count is 0", () => {

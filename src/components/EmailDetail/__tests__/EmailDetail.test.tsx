@@ -1,78 +1,34 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import "@testing-library/jest-dom";
+import { render, screen, fireEvent } from "../../../test-utils";
 import EmailDetail from "../index";
-import { EmailItem } from "../../EmailList/EmailItems";
+import {
+  createMockEmailWithReplies,
+  mockFunctions,
+  setupTestEnvironment,
+} from "../../../test-utils";
 
-jest.mock("../../EmailMessage", () => {
-  return function MockEmailMessage({
-    email,
-    isMinimized,
-    onToggleMinimization,
-    isReply,
-  }: {
-    email: { id: number; from: string; content: string };
-    isMinimized: boolean;
-    onToggleMinimization: () => void;
-    isReply?: boolean;
-  }) {
-    return (
-      <div
-        data-testid={`email-message-${email.id}`}
-        data-minimized={isMinimized}
-        data-reply={isReply}
-      >
-        <div onClick={onToggleMinimization} data-testid={`toggle-${email.id}`}>
-          {email.from} - {email.content}
-        </div>
-      </div>
-    );
-  };
-});
+import { MockEmailMessage } from "../../../test-utils";
 
-const mockEmail: EmailItem = {
+jest.mock("../../EmailMessage", () => MockEmailMessage);
+
+const mockEmail = createMockEmailWithReplies({
   id: 1,
   title: "Test Email Title",
   from: "John Doe",
   content: "This is a test email content",
-  isRead: false,
-  isSpam: false,
-  isStarred: false,
-  reply: [
-    {
-      id: 1.1,
-      from: "Jane Smith",
-      content: "This is a test reply",
-      sender: "jane.smith@example.com",
-      receiver: "me",
-      isStarred: false,
-      date: new Date("2025-03-14T11:30:00Z"),
-    },
-    {
-      id: 1.2,
-      from: "Bob Wilson",
-      content: "This is another test reply",
-      sender: "bob.wilson@example.com",
-      receiver: "me",
-      isStarred: true,
-      date: new Date("2025-03-14T12:30:00Z"),
-    },
-  ],
   date: new Date("2025-03-14T10:30:00Z"),
   sender: "john.doe@example.com",
   receiver: "me",
   box: "inbox",
-};
+});
 
 describe("EmailDetail", () => {
+  setupTestEnvironment();
+
   const defaultProps = {
     email: mockEmail,
-    setSelectedEmail: jest.fn(),
-    updateEmail: jest.fn(),
+    setSelectedEmail: mockFunctions.setSelectedEmail,
+    updateEmail: mockFunctions.updateEmail,
   };
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
 
   describe("Basic Rendering", () => {
     it("should render email title", () => {
@@ -95,12 +51,10 @@ describe("EmailDetail", () => {
 
       expect(screen.getByTestId("email-message-1.1")).toBeInTheDocument();
       expect(screen.getByTestId("email-message-1.2")).toBeInTheDocument();
-      expect(
-        screen.getByText("Jane Smith - This is a test reply")
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText("Bob Wilson - This is another test reply")
-      ).toBeInTheDocument();
+      const replyElements = screen.getAllByText(
+        "reply@example.com - Test reply content"
+      );
+      expect(replyElements).toHaveLength(2);
     });
 
     it("should mark replies with data-reply=true", () => {

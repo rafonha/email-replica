@@ -1,42 +1,39 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import "@testing-library/jest-dom";
+import { render, screen, fireEvent } from "../../../test-utils";
 import EmailMessage from "../index";
-import { EmailItem, ReplyItem } from "../../EmailList/EmailItems";
+import {
+  createMockEmail,
+  createMockReply,
+  mockFunctions,
+  setupTestEnvironment,
+} from "../../../test-utils";
 
-const mockEmail: EmailItem = {
+const mockEmail = createMockEmail({
   id: 1,
   title: "Test Email",
   from: "John Doe",
   content: "This is a test email content",
-  isRead: false,
-  isSpam: false,
-  isStarred: false,
-  reply: [],
   date: new Date("2025-03-14T10:30:00Z"),
   sender: "john.doe@example.com",
   receiver: "me",
   box: "inbox",
-};
+});
 
-const mockReply: ReplyItem = {
+const mockReply = createMockReply({
   id: 1.1,
   from: "Jane Smith",
   content: "This is a test reply content",
+  date: new Date("2025-03-14T11:30:00Z"),
   sender: "jane.smith@example.com",
   receiver: "me",
-  isStarred: false,
-  date: new Date("2025-03-14T11:30:00Z"),
-};
+});
 
 describe("EmailMessage", () => {
+  setupTestEnvironment();
+
   const defaultProps = {
     isMinimized: false,
-    onToggleMinimization: jest.fn(),
+    onToggleMinimization: mockFunctions.onToggleMinimization,
   };
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
 
   describe("Main Email", () => {
     it("should render main email correctly", () => {

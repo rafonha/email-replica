@@ -1,74 +1,26 @@
-import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
+import { render, screen } from "../../../test-utils";
 import EmailList from "../index";
-import { EmailItem } from "../EmailItems";
+import {
+  createMockEmailList,
+  mockFunctions,
+  setupTestEnvironment,
+} from "../../../test-utils";
 
-jest.mock("../../EmailListItem", () => {
-  return function MockEmailListItem({ email }: { email: EmailItem }) {
-    return (
-      <div data-testid={`email-item-${email.id}`}>
-        {email.from} - {email.title}
-      </div>
-    );
-  };
-});
+import { MockEmailListItem } from "../../../test-utils";
 
-const mockEmails: EmailItem[] = [
-  {
-    id: 1,
-    title: "Test Email 1",
-    from: "John Doe",
-    content: "Test content 1",
-    isRead: false,
-    isSpam: false,
-    isStarred: false,
-    reply: [],
-    date: new Date("2025-03-14T10:30:00Z"),
-    sender: "john@example.com",
-    receiver: "me",
-    box: "inbox",
-  },
-  {
-    id: 2,
-    title: "Test Email 2",
-    from: "Jane Smith",
-    content: "Test content 2",
-    isRead: true,
-    isSpam: false,
-    isStarred: true,
-    reply: [],
-    date: new Date("2025-03-14T11:30:00Z"),
-    sender: "jane@example.com",
-    receiver: "me",
-    box: "inbox",
-  },
-  {
-    id: 3,
-    title: "Test Email 3",
-    from: "Bob Wilson",
-    content: "Test content 3",
-    isRead: false,
-    isSpam: false,
-    isStarred: false,
-    reply: [],
-    date: new Date("2025-03-14T12:30:00Z"),
-    sender: "bob@example.com",
-    receiver: "me",
-    box: "inbox",
-  },
-];
+jest.mock("../../EmailListItem", () => MockEmailListItem);
+
+const mockEmails = createMockEmailList(3);
 
 describe("EmailList", () => {
+  setupTestEnvironment();
+
   const defaultProps = {
     emails: mockEmails,
-    setSelectedEmail: jest.fn(),
-    updateEmail: jest.fn(),
+    setSelectedEmail: mockFunctions.setSelectedEmail,
+    updateEmail: mockFunctions.updateEmail,
     selectedBox: "inbox",
   };
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
 
   describe("Rendering", () => {
     it("should render all email items", () => {
@@ -82,9 +34,9 @@ describe("EmailList", () => {
     it("should render email content correctly", () => {
       render(<EmailList {...defaultProps} />);
 
-      expect(screen.getByText("John Doe - Test Email 1")).toBeInTheDocument();
-      expect(screen.getByText("Jane Smith - Test Email 2")).toBeInTheDocument();
-      expect(screen.getByText("Bob Wilson - Test Email 3")).toBeInTheDocument();
+      expect(screen.getByText("User 1 - Test Email 1")).toBeInTheDocument();
+      expect(screen.getByText("User 2 - Test Email 2")).toBeInTheDocument();
+      expect(screen.getByText("User 3 - Test Email 3")).toBeInTheDocument();
     });
 
     it("should have correct container structure", () => {

@@ -1,68 +1,43 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import "@testing-library/jest-dom";
+import { render, screen, fireEvent } from "../../../test-utils";
 import EmailListItem from "../index";
-import { EmailItem } from "../../EmailList/EmailItems";
+import {
+  createMockEmail,
+  createMockEmailWithReplies,
+  mockFunctions,
+  setupTestEnvironment,
+} from "../../../test-utils";
 
-const mockEmail: EmailItem = {
+const mockEmail = createMockEmail({
   id: 1,
   title: "Test Email",
   from: "John Doe",
   content: "This is a test email content",
-  isRead: false,
-  isSpam: false,
-  isStarred: false,
-  reply: [],
   date: new Date("2025-03-14T10:30:00Z"),
   sender: "john@example.com",
   receiver: "me",
   box: "inbox",
-};
+});
 
-const mockEmailWithReplies: EmailItem = {
+const mockEmailWithReplies = createMockEmailWithReplies({
   id: 2,
   title: "Email with Replies",
   from: "Jane Smith",
   content: "Original email content",
-  isRead: false,
-  isSpam: false,
-  isStarred: false,
-  reply: [
-    {
-      id: 1,
-      from: "Bob Wilson",
-      content: "First reply content",
-      date: new Date("2025-03-14T11:30:00Z"),
-      sender: "bob@example.com",
-      receiver: "jane@example.com",
-      isStarred: false,
-    },
-    {
-      id: 2,
-      from: "Alice Brown",
-      content: "Second reply content",
-      date: new Date("2025-03-14T12:30:00Z"),
-      sender: "alice@example.com",
-      receiver: "jane@example.com",
-      isStarred: false,
-    },
-  ],
   date: new Date("2025-03-14T10:30:00Z"),
   sender: "jane@example.com",
   receiver: "me",
   box: "inbox",
-};
+});
 
 describe("EmailListItem", () => {
+  setupTestEnvironment();
+
   const defaultProps = {
     email: mockEmail,
-    setSelectedEmail: jest.fn(),
-    updateEmail: jest.fn(),
+    setSelectedEmail: mockFunctions.setSelectedEmail,
+    updateEmail: mockFunctions.updateEmail,
     selectedBox: "inbox",
   };
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
 
   describe("Rendering", () => {
     it("should render email item with correct content", () => {
@@ -106,7 +81,7 @@ describe("EmailListItem", () => {
     it("should display latest reply content as preview", () => {
       render(<EmailListItem {...defaultProps} email={mockEmailWithReplies} />);
 
-      expect(screen.getByText("Second reply content")).toBeInTheDocument();
+      expect(screen.getByText("Test reply content")).toBeInTheDocument();
     });
   });
 
