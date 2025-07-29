@@ -1,6 +1,6 @@
 # 📧 Email Replica
 
-A modern, responsive email client interface built with Next.js, React, and TypeScript. This project replicates the core functionality of popular email clients like Gmail with a clean, intuitive design.
+A modern email client interface built with Next.js, React, and TypeScript. This project replicates the core functionality of popular email clients like Gmail with a clean, intuitive design.
 
 ## ✨ Features
 
@@ -113,12 +113,6 @@ npm run test:watch
 npm run test:coverage
 ```
 
-### Test Coverage
-- **EmailMessage**: 100% coverage
-- **EmailDetail**: 77.41% coverage  
-- **EmailItems**: 100% coverage
-- **Total**: 51 tests passing
-
 ### Test Structure
 - Unit tests for all components
 - Mock implementations for external dependencies
@@ -145,13 +139,6 @@ This project uses **Tailwind CSS v4** for styling with:
 - Dark mode support (planned)
 - Custom component classes
 - Consistent design system
-
-## 📱 Responsive Design
-
-The application is fully responsive and works on:
-- **Desktop**: Full-featured interface with sidebar
-- **Tablet**: Adaptive layout with collapsible sidebar
-- **Mobile**: Mobile-optimized interface
 
 ## 🔧 Technology Stack
 
@@ -180,21 +167,6 @@ The application is fully responsive and works on:
 - **Loading Speed**: Fast initial load with SSR
 - **Runtime Performance**: Optimized React components
 
-## 🚀 Deployment
-
-### Vercel (Recommended)
-```bash
-npm run build
-vercel --prod
-```
-
-### Other Platforms
-The application can be deployed to any platform that supports Next.js:
-- Netlify
-- AWS Amplify
-- Railway
-- DigitalOcean App Platform
-
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -214,20 +186,9 @@ The application can be deployed to any platform that supports Next.js:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
-
-- **Next.js Team**: For the amazing React framework
-- **Tailwind CSS**: For the utility-first CSS framework
-- **React Testing Library**: For excellent testing utilities
-- **Vercel**: For hosting and deployment platform
-
 ## 📞 Support
 
 If you have any questions or need help:
 - Open an issue on GitHub
 - Check the documentation
 - Review the test files for usage examples
-
----
-
-**Built with ❤️ using Next.js, React, and TypeScript**
