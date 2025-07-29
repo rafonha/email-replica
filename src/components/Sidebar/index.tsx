@@ -2,19 +2,25 @@
 
 import { useState } from "react";
 import navItems from "./NavItems";
+import { EmailItem } from "../EmailList/EmailItems";
 
 export default function Sidebar({
   selectedMailbox,
   setSelectedMailbox,
+  emailCountByBox,
+  setSelectedEmail,
 }: {
   selectedMailbox: string;
   setSelectedMailbox: (mailbox: string) => void;
+  emailCountByBox: Record<string, number>;
+  setSelectedEmail: (email: EmailItem | null) => void;
 }) {
   const [activeItem, setActiveItem] = useState(selectedMailbox);
 
   const handleItemClick = (id: string) => {
     setActiveItem(id);
     setSelectedMailbox(id);
+    setSelectedEmail(null);
   };
 
   return (
@@ -42,14 +48,15 @@ export default function Sidebar({
                   activeItem === item.id ? "font-semibold" : "font-normal"
                 }`}
               >
-                {item.label}
+                {item.label || "No title"}
               </span>
             </div>
-            {item.count && (
-              <span className="text-xs font-normal text-[rgb(32,33,36)]">
-                {item.count}
-              </span>
-            )}
+            {["inbox", "spam"].includes(item.id) &&
+              emailCountByBox[item.id] > 0 && (
+                <span className="text-xs font-normal text-[rgb(32,33,36)]">
+                  {emailCountByBox[item.id]}
+                </span>
+              )}
           </button>
         ))}
       </nav>

@@ -1,15 +1,23 @@
 import { useState } from "react";
-import { EmailItem } from "../EmailList/EmailItems";
+import { EmailItem, emailItems } from "../EmailList/EmailItems";
 import starFilled from "../../assets/icon-star-filled-yellow.webp";
 import starEmpty from "../../assets/icon-star.webp";
 import Image from "next/image";
 
-export default function EmailListItem({ email }: { email: EmailItem }) {
-  const [isStarred, setIsStarred] = useState(email.isStarred);
-
+export default function EmailListItem({
+  email,
+  setSelectedEmail,
+  updateEmail,
+  selectedBox,
+}: {
+  email: EmailItem;
+  setSelectedEmail: (email: EmailItem) => void;
+  updateEmail: (emailId: number, updates: Partial<EmailItem>) => void;
+  selectedBox: string;
+}) {
   const handleStarClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsStarred(!isStarred);
+    updateEmail(email.id, { isStarred: !email.isStarred });
   };
 
   const formatDate = (date: Date) => {
@@ -46,26 +54,34 @@ export default function EmailListItem({ email }: { email: EmailItem }) {
     return email.content;
   };
 
+  const handleSelectedEmail = () => {
+    updateEmail(email.id, { isRead: true });
+    setSelectedEmail(email);
+  };
+
   return (
     <div
+      onClick={handleSelectedEmail}
       className={`relative flex h-[40px] cursor-pointer items-center gap-3 border-b border-gray-200 px-4 text-sm hover:z-10 hover:shadow-md ${
         email.isRead ? "bg-gray-50" : "bg-white"
       }`}
     >
-      <div className="flex-shrink-0 mr-3">
-        <button
-          onClick={handleStarClick}
-          className="p-1 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
-        >
-          <Image
-            src={isStarred ? starFilled : starEmpty}
-            alt="Star"
-            width={16}
-            height={16}
-            className="w-4 h-4"
-          />
-        </button>
-      </div>
+      {email.box !== "trash" && selectedBox !== "trash" && (
+        <div className="flex-shrink-0 mr-3">
+          <button
+            onClick={handleStarClick}
+            className="p-1 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
+          >
+            <Image
+              src={email.isStarred ? starFilled : starEmpty}
+              alt="Star"
+              width={16}
+              height={16}
+              className="w-4 h-4"
+            />
+          </button>
+        </div>
+      )}
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
@@ -79,7 +95,7 @@ export default function EmailListItem({ email }: { email: EmailItem }) {
                 {getSenderDisplay()}
               </span>
               <span
-                className={`font-semibold text-gray-900 truncate ${
+                className={`text-gray-900  shrink-0 ${
                   email.isRead ? "font-normal" : "font-semibold"
                 }`}
               >
@@ -93,7 +109,7 @@ export default function EmailListItem({ email }: { email: EmailItem }) {
                 -
               </span>
               <span
-                className={`text-gray-500 truncate shrink-0 ${
+                className={`text-gray-500 truncate ${
                   email.isRead ? "font-normal" : "font-semibold"
                 }`}
               >
@@ -103,7 +119,7 @@ export default function EmailListItem({ email }: { email: EmailItem }) {
           </div>
 
           <div className="flex-shrink-0 ml-4">
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-500  shrink-0">
               {formatDate(email.date)}
             </span>
           </div>

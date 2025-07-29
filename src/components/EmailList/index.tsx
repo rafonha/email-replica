@@ -2,17 +2,29 @@ import EmailListItem from "../EmailListItem";
 import { EmailItem } from "./EmailItems";
 
 export default function EmailList({
-  mailbox,
   emails,
+  setSelectedEmail,
+  updateEmail,
+  selectedBox,
 }: {
-  mailbox: string;
   emails: EmailItem[];
+  setSelectedEmail: (email: EmailItem) => void;
+  updateEmail: (emailId: number, updates: Partial<EmailItem>) => void;
+  selectedBox: string;
 }) {
   return (
     <>
       <div className="flex h-[48px] items-center px-4" />
       {emails.length > 0 ? (
-        emails.map((email) => <EmailListItem key={email.id} email={email} />)
+        emails.map((email) => (
+          <EmailListItem
+            key={email.id}
+            email={email}
+            setSelectedEmail={setSelectedEmail}
+            updateEmail={updateEmail}
+            selectedBox={selectedBox}
+          />
+        ))
       ) : (
         <div className="p-8 text-center text-gray-500">Empty</div>
       )}

@@ -17,7 +17,7 @@ const navItems: NavItem[] = [
     id: "inbox",
     label: "Inbox",
     iconSrc: inboxIcon.src,
-    count: 5,
+    count: 0,
     isActive: true,
   },
   {
@@ -38,7 +38,7 @@ const navItems: NavItem[] = [
     id: "spam",
     label: "Spam",
     iconSrc: spamIcon.src,
-    count: 1,
+    count: 0,
     isActive: false,
   },
   {
