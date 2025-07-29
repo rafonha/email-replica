@@ -3,6 +3,7 @@
 import { useState } from "react";
 import navItems from "./NavItems";
 import { EmailItem } from "../EmailList/EmailItems";
+import Image from "next/image";
 
 export default function Sidebar({
   selectedMailbox,
@@ -38,10 +39,12 @@ export default function Sidebar({
             }`}
           >
             <div className="flex items-center">
-              <img
+              <Image
                 src={item.iconSrc}
                 alt={item.label}
                 className="w-5 h-5 mr-3"
+                width={20}
+                height={20}
               />
               <span
                 className={`text-sm text-[rgb(32,33,36)] flex-1 ${

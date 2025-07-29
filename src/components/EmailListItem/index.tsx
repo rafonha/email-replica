@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { EmailItem, emailItems } from "../EmailList/EmailItems";
+import { EmailItem } from "../EmailList/EmailItems";
 import starFilled from "../../assets/icon-star-filled-yellow.webp";
 import starEmpty from "../../assets/icon-star.webp";
 import Image from "next/image";

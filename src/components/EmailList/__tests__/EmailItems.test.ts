@@ -60,7 +60,7 @@ describe('EmailItems', () => {
     })
 
     it('should have valid structure for all emails', () => {
-      emailItems.forEach((email, index) => {
+      emailItems.forEach((email) => {
         expect(email).toHaveProperty('id')
         expect(email).toHaveProperty('title')
         expect(email).toHaveProperty('from')
@@ -111,7 +111,7 @@ describe('EmailItems', () => {
 
     it('should have valid structure for all replies', () => {
       emailItems.forEach(email => {
-        email.reply.forEach((reply, replyIndex) => {
+        email.reply.forEach((reply) => {
           expect(reply).toHaveProperty('id')
           expect(reply).toHaveProperty('from')
           expect(reply).toHaveProperty('content')

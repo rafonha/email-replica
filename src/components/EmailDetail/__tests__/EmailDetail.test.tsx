@@ -9,7 +9,12 @@ jest.mock("../../EmailMessage", () => {
     isMinimized,
     onToggleMinimization,
     isReply,
-  }: any) {
+  }: {
+    email: { id: number; from: string; content: string };
+    isMinimized: boolean;
+    onToggleMinimization: () => void;
+    isReply?: boolean;
+  }) {
     return (
       <div
         data-testid={`email-message-${email.id}`}

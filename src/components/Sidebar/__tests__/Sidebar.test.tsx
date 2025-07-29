@@ -1,22 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Sidebar from "../index";
-import { EmailItem } from "../../EmailList/EmailItems";
-
-const mockEmail: EmailItem = {
-  id: 1,
-  title: "Test Email",
-  from: "John Doe",
-  content: "Test content",
-  isRead: false,
-  isSpam: false,
-  isStarred: false,
-  reply: [],
-  date: new Date(),
-  sender: "john@example.com",
-  receiver: "me",
-  box: "inbox",
-};
 
 describe("Sidebar", () => {
   const defaultProps = {
