@@ -1,10 +1,10 @@
 import { EmailItem } from "../EmailList/EmailItems";
 import arrowLeft from "../../assets/icon-left-chevron.png";
-import starFilled from "../../assets/icon-star-filled-yellow.webp";
-import starEmpty from "../../assets/icon-star.webp";
-import trash from "../../assets/icon-trash.webp";
 import spam from "../../assets/icon-spam.webp";
+import trash from "../../assets/icon-trash.webp";
 import Image from "next/image";
+import { useState } from "react";
+import EmailMessage from "../EmailMessage";
 
 export default function EmailDetail({
   email,
@@ -15,6 +15,38 @@ export default function EmailDetail({
   setSelectedEmail: (email: EmailItem | null) => void;
   updateEmail: (emailId: number, updates: Partial<EmailItem>) => void;
 }) {
+  const [minimizedEmails, setMinimizedEmails] = useState<Set<number>>(
+    new Set()
+  );
+
+  const toggleEmailMinimization = (emailId: number) => {
+    setMinimizedEmails((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(emailId)) {
+        newSet.delete(emailId);
+      } else {
+        newSet.add(emailId);
+      }
+      return newSet;
+    });
+  };
+
+  const getTimeDifference = (date: Date) => {
+    const targetDate = new Date("2025-03-14T15:14:00");
+    const timeDiff = targetDate.getTime() - date.getTime();
+    const hoursDiff = Math.floor(timeDiff / (1000 * 60 * 60));
+
+    const formattedDate = date.toLocaleString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    });
+    return `${formattedDate} (${hoursDiff} hours ago)`;
+  };
+
   return (
     <div className="flex flex-col h-full">
       <header className="px-4 pt-2 pb-0">
@@ -70,7 +102,7 @@ export default function EmailDetail({
               }}
               className="cursor-pointer rounded-full p-2 hover:bg-gray-100"
             >
-              <p className="cursor-pointer rounded px-3 py-1.5 text-sm hover:bg-gray-100">
+              <p className="rounded px-3 py-1.5 text-sm hover:bg-gray-100">
                 Not spam
               </p>
             </button>
@@ -82,7 +114,7 @@ export default function EmailDetail({
               }}
               className="cursor-pointer rounded-full p-2 hover:bg-gray-100"
             >
-              <p className="cursor-pointer rounded px-3 py-1.5 text-sm hover:bg-gray-100">
+              <p className="rounded px-3 py-1.5 text-sm hover:bg-gray-100">
                 Move to inbox
               </p>
             </button>
@@ -93,77 +125,24 @@ export default function EmailDetail({
         </div>
       </header>
       <main className="p-4">
-        <div className="flex items-center gap-4 mb-4">
-          <p className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
-            {email.from
-              .split(" ")
-              .map((name) => name[0].toUpperCase())
-              .slice(0, 2)
-              .join("")}
-          </p>
-          <div className="flex flex-row justify-between gap-1 w-full">
-            <div className="flex flex-col gap-1">
-              <div className="flex gap-1">
-                <p className="truncate text-sm font-semibold">{email.from}</p>
-                <p className="truncate text-xs text-gray-500">
-                  &lt;{email.sender}&gt;
-                </p>
-              </div>
-              <p className="truncate text-xs text-gray-500">
-                to {email.receiver}
-              </p>
-            </div>
-            <div className="flex gap-2 justify-baseline">
-              <p className="truncate text-xs whitespace-nowrap text-gray-500">
-                {email.date.toLocaleDateString("pt-BR", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-              {email.box !== "trash" && (
-                <button
-                  style={{ background: "none", border: "none" }}
-                  onClick={() => {
-                    updateEmail(email.id, { isStarred: !email.isStarred });
-                  }}
-                >
-                  <Image
-                    src={email.isStarred ? starFilled : starEmpty}
-                    alt="Star"
-                    width={20}
-                    height={20}
-                  />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-        <p className="mt-1 ml-[52px] text-[13px] whitespace-pre-wrap">
-          {email.content}
-        </p>
+        <EmailMessage
+          email={email}
+          isMinimized={minimizedEmails.has(email.id)}
+          onToggleMinimization={() => toggleEmailMinimization(email.id)}
+          onToggleStar={() =>
+            updateEmail(email.id, { isStarred: !email.isStarred })
+          }
+          showStarButton={email.box !== "trash"}
+          getTimeDifference={getTimeDifference}
+        />
         {email.reply.map((reply, index) => (
           <div key={index} className="mt-8 border-t border-gray-200 pt-4">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white">
-                {reply.from[0].toUpperCase()}
-              </div>
-              <div>
-                <div className="font-semibold">{reply.from}</div>
-                <div className="text-sm text-gray-500">
-                  {reply.date.toLocaleDateString("pt-BR", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </div>
-              </div>
-            </div>
-            <div className="whitespace-pre-wrap">{reply.content}</div>
+            <EmailMessage
+              email={reply}
+              isMinimized={minimizedEmails.has(reply.id)}
+              onToggleMinimization={() => toggleEmailMinimization(reply.id)}
+              isReply={true}
+            />
           </div>
         ))}
       </main>

@@ -13,7 +13,7 @@ export interface EmailItem {
   box: string;
 }
 
-interface ReplyItem {
+export interface ReplyItem {
   id: number;
   from: string;
   content: string;
