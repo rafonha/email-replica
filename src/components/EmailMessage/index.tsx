@@ -10,7 +10,6 @@ interface EmailMessageProps {
   onToggleMinimization: () => void;
   onToggleStar?: () => void;
   showStarButton?: boolean;
-  isReply?: boolean;
   getTimeDifference?: (date: Date) => string;
   searchQuery?: string;
 }
@@ -21,7 +20,6 @@ export default function EmailMessage({
   onToggleMinimization,
   onToggleStar,
   showStarButton = true,
-  isReply = false,
   getTimeDifference,
   searchQuery = "",
 }: EmailMessageProps) {

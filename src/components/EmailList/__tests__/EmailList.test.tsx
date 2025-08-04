@@ -88,6 +88,32 @@ describe("EmailList", () => {
       const emailItems = screen.getAllByTestId(/email-item-/);
       expect(emailItems).toHaveLength(3);
     });
+
+    it("should include emails with starred replies in starred mailbox", () => {
+      const emailWithStarredReply = {
+        ...defaultProps.emails[0],
+        isStarred: false,
+        reply: [
+          {
+            id: 1.1,
+            title: "Reply",
+            from: "Reply Sender",
+            content: "Reply content",
+            date: new Date("2025-03-14T11:30:00Z"),
+            sender: "reply@example.com",
+            receiver: "me",
+            box: "inbox",
+            isRead: true,
+            isSpam: false,
+            isStarred: true,
+            reply: []
+          }
+        ]
+      };
+      
+      render(<EmailList {...defaultProps} emails={[emailWithStarredReply]} selectedBox="starred" />);
+      expect(screen.getByText("User 1 - Test Email 1")).toBeInTheDocument();
+    });
   });
 
   describe("Different Selected Boxes", () => {

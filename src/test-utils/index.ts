@@ -1,4 +1,4 @@
-import { EmailItem, ReplyItem } from "../components/EmailList/EmailItems";
+import { EmailItem } from "../components/EmailList/EmailItems";
 
 export const createMockEmail = (overrides: Partial<EmailItem> = {}): EmailItem => ({
   id: Math.floor(Math.random() * 1000),
@@ -16,20 +16,25 @@ export const createMockEmail = (overrides: Partial<EmailItem> = {}): EmailItem =
   ...overrides,
 });
 
-export const createMockReply = (overrides: Partial<ReplyItem> = {}): ReplyItem => ({
+export const createMockReply = (overrides: Partial<EmailItem> = {}): EmailItem => ({
   id: Math.floor(Math.random() * 1000) + 0.1,
+  title: "Test Reply",
   from: "reply@example.com",
   content: "Test reply content",
   sender: "reply@example.com",
   receiver: "me",
   isStarred: false,
   date: new Date("2025-03-14T11:30:00Z"),
+  isRead: false,
+  isSpam: false,
+  reply: [],
+  box: "inbox",
   ...overrides,
 });
 
 export const createMockEmailWithReplies = (
   emailOverrides: Partial<EmailItem> = {},
-  replies: ReplyItem[] = []
+  replies: EmailItem[] = []
 ): EmailItem => {
   const baseEmail = createMockEmail(emailOverrides);
   return {

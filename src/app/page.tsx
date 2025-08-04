@@ -20,7 +20,9 @@ export default function Home() {
     if (selectedMailbox === "all-mail") {
       filteredEmails = allEmails;
     } else if (selectedMailbox === "starred") {
-      filteredEmails = allEmails.filter((email) => email.isStarred);
+      filteredEmails = allEmails.filter((email) => 
+        email.isStarred || email.reply.some(reply => reply.isStarred)
+      );
     } else {
       filteredEmails = allEmails.filter((email) => email.box === selectedMailbox);
     }
@@ -41,6 +43,9 @@ export default function Home() {
   const emailCountByBox = useMemo(() => {
     return allEmails.reduce((acc, email) => {
       acc[email.box] = (acc[email.box] || 0) + 1;
+      if (email.isStarred || email.reply.some(reply => reply.isStarred)) {
+        acc.starred = (acc.starred || 0) + 1;
+      }
       return acc;
     }, {} as Record<string, number>);
   }, [allEmails]);

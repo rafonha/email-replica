@@ -227,7 +227,6 @@ export default function EmailDetail({
               email={reply}
               isMinimized={minimizedEmails.has(reply.id)}
               onToggleMinimization={() => toggleEmailMinimization(reply.id)}
-              isReply={true}
               onToggleStar={() => onToggleReplyStar(reply.id)}
               showStarButton={email.box !== "trash"}
               getTimeDifference={getTimeDifference}
