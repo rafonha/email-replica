@@ -1,16 +1,18 @@
-import { EmailItem, ReplyItem } from "../EmailList/EmailItems";
+import { EmailItem } from "../EmailList/EmailItems";
 import starFilled from "../../assets/icon-star-filled-yellow.webp";
 import starEmpty from "../../assets/icon-star.webp";
 import Image from "next/image";
+import React from "react";
 
 interface EmailMessageProps {
-  email: EmailItem | ReplyItem;
+  email: EmailItem;
   isMinimized: boolean;
   onToggleMinimization: () => void;
   onToggleStar?: () => void;
   showStarButton?: boolean;
   isReply?: boolean;
   getTimeDifference?: (date: Date) => string;
+  searchQuery?: string;
 }
 
 export default function EmailMessage({
@@ -18,19 +20,20 @@ export default function EmailMessage({
   isMinimized,
   onToggleMinimization,
   onToggleStar,
-  showStarButton = false,
+  showStarButton = true,
   isReply = false,
   getTimeDifference,
+  searchQuery = "",
 }: EmailMessageProps) {
-  const avatarSize = isReply ? "w-8 h-8" : "w-10 h-10";
-  const avatarBgColor = isReply ? "bg-green-500" : "bg-blue-500";
-  const containerMargin = isReply ? "" : "mb-4";
+  const avatarSize = "w-10 h-10";
+  const avatarBgColor = "bg-blue-500";
+  const containerMargin = "mb-4";
 
   const formatDate = (date: Date) => {
     if (getTimeDifference) {
       return getTimeDifference(date);
     }
-    return date.toLocaleDateString("pt-BR", {
+    return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -40,14 +43,32 @@ export default function EmailMessage({
   };
 
   const getInitials = (name: string) => {
-    if (isReply) {
-      return name[0].toUpperCase();
-    }
     return name
       .split(" ")
       .map((name) => name[0].toUpperCase())
       .slice(0, 2)
       .join("");
+  };
+
+  const highlightSearchQuery = (text: string) => {
+    if (!searchQuery.trim()) {
+      return text;
+    }
+    const regex = new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    const parts = text.split(regex);
+    return parts.map((part, index) => (
+      <React.Fragment key={index}>
+        {regex.test(part) ? (
+          <span className="bg-yellow-200">{part}</span>
+        ) : (
+          part
+        )}
+      </React.Fragment>
+    ));
+  };
+
+  const isSearchMatch = (text: string) => {
+    return text.toLowerCase().includes(searchQuery.toLowerCase()) && searchQuery.length > 0;
   };
 
   return (
@@ -64,10 +85,12 @@ export default function EmailMessage({
         >
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline gap-2">
-              <p className="truncate text-sm font-semibold">{email.from}</p>
+              <p className="truncate text-sm font-semibold">
+                {isSearchMatch(email.from) ? highlightSearchQuery(email.from) : email.from}
+              </p>
               {!isMinimized && (
                 <p className="truncate text-xs text-gray-500">
-                  &lt;{email.sender}&gt;
+                  &lt;{isSearchMatch(email.sender) ? highlightSearchQuery(email.sender) : email.sender}&gt;
                 </p>
               )}
             </div>
@@ -77,20 +100,20 @@ export default function EmailMessage({
               {formatDate(email.date)}
             </p>
             {showStarButton && onToggleStar && (
-              <button
-                style={{ background: "none", border: "none" }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleStar();
-                }}
-              >
-                <Image
-                  src={email.isStarred ? starFilled : starEmpty}
-                  alt="Star"
-                  width={20}
-                  height={20}
-                />
-              </button>
+                <button
+                  style={{ background: "none", border: "none" }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleStar();
+                  }}
+                >
+                  <Image
+                    src={email.isStarred ? starFilled : starEmpty}
+                    alt="Star"
+                    width={20}
+                    height={20}
+                  />
+                </button>
             )}
           </div>
         </div>
@@ -104,7 +127,7 @@ export default function EmailMessage({
               : "mt-1 text-[13px] whitespace-pre-wrap"
           }
         >
-          {email.content}
+          {isSearchMatch(email.content) ? highlightSearchQuery(email.content) : email.content}
         </p>
       </div>
     </div>

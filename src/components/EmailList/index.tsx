@@ -5,12 +5,14 @@ export default function EmailList({
   emails,
   setSelectedEmail,
   updateEmail,
-  selectedBox,
+  selectedBox,  
+  searchQuery,
 }: {
   emails: EmailItem[];
   setSelectedEmail: (email: EmailItem) => void;
   updateEmail: (emailId: number, updates: Partial<EmailItem>) => void;
   selectedBox: string;
+  searchQuery: string;
 }) {
   return (
     <>
@@ -23,6 +25,7 @@ export default function EmailList({
             setSelectedEmail={setSelectedEmail}
             updateEmail={updateEmail}
             selectedBox={selectedBox}
+            searchQuery={searchQuery}
           />
         ))
       ) : (

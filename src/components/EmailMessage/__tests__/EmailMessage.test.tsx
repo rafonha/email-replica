@@ -175,7 +175,7 @@ describe("EmailMessage", () => {
   describe("Reply", () => {
     it("should render reply correctly", () => {
       render(
-        <EmailMessage email={mockReply} {...defaultProps} isReply={true} />
+        <EmailMessage email={mockReply} {...defaultProps}  />
       );
 
       expect(screen.getByText("Jane Smith")).toBeInTheDocument();
@@ -188,16 +188,16 @@ describe("EmailMessage", () => {
 
     it("should show avatar with correct initial for reply", () => {
       render(
-        <EmailMessage email={mockReply} {...defaultProps} isReply={true} />
+        <EmailMessage email={mockReply} {...defaultProps} />
       );
 
-      const avatar = screen.getByText("J");
+      const avatar = screen.getByText("JS");
       expect(avatar).toBeInTheDocument();
       const avatarContainer = avatar.closest("div");
       expect(avatarContainer).toHaveClass(
-        "w-8",
-        "h-8",
-        "bg-green-500",
+        "w-10",
+        "h-10",
+        "bg-blue-500",
         "rounded-full",
         "flex",
         "items-center",
@@ -208,7 +208,7 @@ describe("EmailMessage", () => {
 
     it("should not show bottom margin when it is a reply", () => {
       render(
-        <EmailMessage email={mockReply} {...defaultProps} isReply={true} />
+        <EmailMessage email={mockReply} {...defaultProps} />
       );
 
       const container = screen
@@ -219,10 +219,10 @@ describe("EmailMessage", () => {
 
     it("should use default date formatting for replies", () => {
       render(
-        <EmailMessage email={mockReply} {...defaultProps} isReply={true} />
+        <EmailMessage email={mockReply} {...defaultProps} />
       );
 
-      const dateText = screen.getByText(/14 de março de 2025/);
+      const dateText = screen.getByText(/March 14, 2025/);
       expect(dateText).toBeInTheDocument();
     });
   });
@@ -241,8 +241,7 @@ describe("EmailMessage", () => {
       render(
         <EmailMessage
           email={singleNameReply}
-          {...defaultProps}
-          isReply={true}
+          {...defaultProps} 
         />
       );
 

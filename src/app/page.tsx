@@ -3,6 +3,7 @@
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import EmailList from "../components/EmailList";
+import SearchField from "../components/SearchField";
 import { useState, useMemo, useCallback } from "react";
 import { emailItems, EmailItem } from "@/components/EmailList/EmailItems";
 import EmailDetail from "@/components/EmailDetail";
@@ -11,16 +12,31 @@ export default function Home() {
   const [allEmails, setAllEmails] = useState<EmailItem[]>(emailItems);
   const [selectedMailbox, setSelectedMailbox] = useState<string>("inbox");
   const [selectedEmail, setSelectedEmail] = useState<EmailItem | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const emails = useMemo(() => {
+    let filteredEmails = allEmails;
+    
     if (selectedMailbox === "all-mail") {
-      return allEmails;
+      filteredEmails = allEmails;
     } else if (selectedMailbox === "starred") {
-      return allEmails.filter((email) => email.isStarred);
+      filteredEmails = allEmails.filter((email) => email.isStarred);
     } else {
-      return allEmails.filter((email) => email.box === selectedMailbox);
+      filteredEmails = allEmails.filter((email) => email.box === selectedMailbox);
     }
-  }, [allEmails, selectedMailbox]);
+    
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filteredEmails = filteredEmails.filter((email) => 
+        email.title.toLowerCase().includes(query) ||
+        email.from.toLowerCase().includes(query) ||
+        email.content.toLowerCase().includes(query) ||
+        email.sender.toLowerCase().includes(query)
+      );
+    }
+    
+    return filteredEmails;
+  }, [allEmails, selectedMailbox, searchQuery]);
 
   const emailCountByBox = useMemo(() => {
     return allEmails.reduce((acc, email) => {
@@ -39,7 +55,10 @@ export default function Home() {
 
       const isOnlyStarringChange =
         Object.keys(updates).length === 1 && "isStarred" in updates;
-      if (!isOnlyStarringChange) {
+      const isOnlyReplyUpdate =
+        Object.keys(updates).length === 1 && "reply" in updates;
+      
+      if (!isOnlyStarringChange && !isOnlyReplyUpdate) {
         setSelectedEmail(null);
       } else {
         setSelectedEmail((prev) =>
@@ -58,6 +77,10 @@ export default function Home() {
     setSelectedEmail(email);
   }, []);
 
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
+  }, []);
+
   return (
     <div className="flex h-screen">
       <div className="w-[68px] shrink-0 bg-[rgb(233,238,246)]" />
@@ -71,11 +94,15 @@ export default function Home() {
             setSelectedEmail={handleSetSelectedEmail}
           />
           <main className="mr-[56px] mb-4 flex min-w-[500px] grow flex-col rounded-2xl bg-white">
+            <div className="p-4">
+              <SearchField onSearch={handleSearch} />
+            </div>
             {selectedEmail ? (
               <EmailDetail
                 email={selectedEmail}
                 setSelectedEmail={handleSetSelectedEmail}
                 updateEmail={updateEmail}
+                searchQuery={searchQuery}
               />
             ) : (
               <EmailList
@@ -83,6 +110,7 @@ export default function Home() {
                 setSelectedEmail={handleSetSelectedEmail}
                 updateEmail={updateEmail}
                 selectedBox={selectedMailbox}
+                searchQuery={searchQuery}
               />
             )}
           </main>

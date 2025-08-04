@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import { EmailItem, ReplyItem } from "../components/EmailList/EmailItems";
+import { EmailItem } from "../components/EmailList/EmailItems";
 
 export const MockEmailMessage = ({
   email,
@@ -8,19 +8,16 @@ export const MockEmailMessage = ({
   onToggleMinimization,
   onToggleStar,
   showStarButton = false,
-  isReply = false,
 }: {
-  email: EmailItem | ReplyItem;
+  email: EmailItem;
   isMinimized: boolean;
   onToggleMinimization: () => void;
   onToggleStar?: () => void;
   showStarButton?: boolean;
-  isReply?: boolean;
 }) => (
   <div
     data-testid={`email-message-${email.id}`}
     data-minimized={isMinimized}
-    data-reply={isReply}
   >
     <div onClick={onToggleMinimization} data-testid={`toggle-${email.id}`}>
       {email.from} - {email.content}

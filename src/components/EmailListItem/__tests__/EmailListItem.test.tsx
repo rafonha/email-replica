@@ -37,6 +37,7 @@ describe("EmailListItem", () => {
     setSelectedEmail: mockFunctions.setSelectedEmail,
     updateEmail: mockFunctions.updateEmail,
     selectedBox: "inbox",
+    searchQuery: "",
   };
 
   describe("Rendering", () => {
@@ -71,6 +72,80 @@ describe("EmailListItem", () => {
     });
   });
 
+  describe("Search Functionality", () => {
+    it("should highlight search query in title", () => {
+      render(<EmailListItem {...defaultProps} searchQuery="Test" />);
+
+      const highlightedElements = screen.getAllByText("Test");
+      expect(highlightedElements.length).toBeGreaterThan(0);
+      highlightedElements.forEach(element => {
+        expect(element).toHaveClass("bg-yellow-200");
+      });
+    });
+
+    it("should highlight search query in sender name", () => {
+      render(<EmailListItem {...defaultProps} searchQuery="John" />);
+
+      const highlightedElements = screen.getAllByText("John");
+      expect(highlightedElements.length).toBeGreaterThan(0);
+      highlightedElements.forEach(element => {
+        expect(element).toHaveClass("bg-yellow-200");
+      });
+    });
+
+    it("should highlight search query in content", () => {
+      render(<EmailListItem {...defaultProps} searchQuery="test" />);
+
+      const highlightedElements = screen.getAllByText("test");
+      expect(highlightedElements.length).toBeGreaterThan(0);
+      highlightedElements.forEach(element => {
+        expect(element).toHaveClass("bg-yellow-200");
+      });
+    });
+
+    it("should not highlight when search query is empty", () => {
+      render(<EmailListItem {...defaultProps} searchQuery="" />);
+
+      const titleElement = screen.getByText("Test Email");
+      expect(titleElement).not.toHaveClass("bg-yellow-200");
+    });
+
+    it("should be case insensitive for search highlighting", () => {
+      render(<EmailListItem {...defaultProps} searchQuery="john" />);
+
+      const highlightedElements = screen.getAllByText("John");
+      expect(highlightedElements.length).toBeGreaterThan(0);
+      highlightedElements.forEach(element => {
+        expect(element).toHaveClass("bg-yellow-200");
+      });
+    });
+
+    it("should highlight all case variations of search term", () => {
+      render(<EmailListItem {...defaultProps} searchQuery="test" />);
+
+      const highlightedElements = screen.getAllByText("Test");
+      expect(highlightedElements.length).toBeGreaterThan(0);
+      highlightedElements.forEach(element => {
+        expect(element).toHaveClass("bg-yellow-200");
+      });
+    });
+
+    it("should highlight multiple occurrences of search query", () => {
+      const emailWithMultipleMatches = {
+        ...mockEmail,
+        title: "Test Email Test",
+        content: "This is a test email with test content",
+      };
+      render(<EmailListItem {...defaultProps} email={emailWithMultipleMatches} searchQuery="test" />);
+
+      const highlightedElements = screen.getAllByText("test");
+      expect(highlightedElements.length).toBeGreaterThan(1);
+      highlightedElements.forEach(element => {
+        expect(element).toHaveClass("bg-yellow-200");
+      });
+    });
+  });
+
   describe("Email with Replies", () => {
     it("should display sender with participant count", () => {
       render(<EmailListItem {...defaultProps} email={mockEmailWithReplies} />);
@@ -82,6 +157,16 @@ describe("EmailListItem", () => {
       render(<EmailListItem {...defaultProps} email={mockEmailWithReplies} />);
 
       expect(screen.getByText("Test reply content")).toBeInTheDocument();
+    });
+
+    it("should highlight search query in reply content", () => {
+      render(<EmailListItem {...defaultProps} email={mockEmailWithReplies} searchQuery="reply" />);
+
+      const highlightedElements = screen.getAllByText("reply");
+      expect(highlightedElements.length).toBeGreaterThan(0);
+      highlightedElements.forEach(element => {
+        expect(element).toHaveClass("bg-yellow-200");
+      });
     });
   });
 

@@ -6,21 +6,11 @@ export interface EmailItem {
   isRead: boolean;
   isSpam: boolean;
   isStarred: boolean;
-  reply: Array<ReplyItem>;
+  reply: Array<EmailItem>;
   date: Date;
   sender: string;
   receiver: string;
   box: string;
-}
-
-export interface ReplyItem {
-  id: number;
-  from: string;
-  content: string;
-  sender: string;
-  receiver: string;
-  isStarred: boolean;
-  date: Date;
 }
 
 export const emailItems: EmailItem[] = [
@@ -73,6 +63,11 @@ export const emailItems: EmailItem[] = [
         receiver: "me",
         isStarred: false,
         date: new Date("2025-03-13T10:15:00Z"),
+        box: "inbox",
+        title: "Re: Team meeting tomorrow",
+        isRead: false,
+        isSpam: false,
+        reply: [],
       },
       {
         id: 3.2,
@@ -82,6 +77,11 @@ export const emailItems: EmailItem[] = [
         receiver: "me",
         isStarred: false,
         date: new Date("2025-03-13T11:30:00Z"),
+        box: "inbox",
+        title: "Re: Team meeting tomorrow",
+        isRead: false,
+        isSpam: false,
+        reply: [],
       }
     ],
   },
@@ -106,6 +106,11 @@ export const emailItems: EmailItem[] = [
         receiver: "me",
         isStarred: false,
         date: new Date("2025-03-11T19:20:00Z"),
+        box: "inbox",
+        title: "Re: Dinner plans this weekend?",
+        isRead: false,
+        isSpam: false,
+        reply: [],
       },
       {
         id: 4.2,
@@ -115,6 +120,11 @@ export const emailItems: EmailItem[] = [
         receiver: "me",
         isStarred: false,
         date: new Date("2025-03-12T09:30:00Z"),
+        box: "inbox",
+        title: "Re: Dinner plans this weekend?",
+        isRead: false,
+        isSpam: false,
+        reply: [],
       },
     ],
   },

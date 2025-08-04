@@ -20,6 +20,7 @@ describe("EmailList", () => {
     setSelectedEmail: mockFunctions.setSelectedEmail,
     updateEmail: mockFunctions.updateEmail,
     selectedBox: "inbox",
+    searchQuery: "",
   };
 
   describe("Rendering", () => {
@@ -79,6 +80,13 @@ describe("EmailList", () => {
 
       expect(screen.getByTestId("email-item-1")).toBeInTheDocument();
       expect(screen.queryByTestId("email-item-2")).not.toBeInTheDocument();
+    });
+
+    it("should pass searchQuery prop to EmailListItem", () => {
+      render(<EmailList {...defaultProps} searchQuery="test" />);
+
+      const emailItems = screen.getAllByTestId(/email-item-/);
+      expect(emailItems).toHaveLength(3);
     });
   });
 

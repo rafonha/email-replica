@@ -2,17 +2,20 @@ import { EmailItem } from "../EmailList/EmailItems";
 import starFilled from "../../assets/icon-star-filled-yellow.webp";
 import starEmpty from "../../assets/icon-star.webp";
 import Image from "next/image";
+import React from "react";
 
 export default function EmailListItem({
   email,
   setSelectedEmail,
   updateEmail,
   selectedBox,
+  searchQuery,
 }: {
   email: EmailItem;
   setSelectedEmail: (email: EmailItem) => void;
   updateEmail: (emailId: number, updates: Partial<EmailItem>) => void;
   selectedBox: string;
+  searchQuery: string;
 }) {
   const handleStarClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -58,6 +61,27 @@ export default function EmailListItem({
     setSelectedEmail(email);
   };
 
+  const isSearchMatch = (text: string) => {
+    return text.toLowerCase().includes(searchQuery.toLowerCase()) && searchQuery.length > 0;
+  };
+
+  const highlightSearchQuery = (text: string) => {
+    if (!searchQuery.trim()) {
+      return text;
+    }
+    const regex = new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    const parts = text.split(regex);
+    return parts.map((part, index) => (
+      <React.Fragment key={index}>
+        {regex.test(part) ? (
+          <span className="bg-yellow-200">{part}</span>
+        ) : (
+          part
+        )}
+      </React.Fragment>
+    ));
+  };
+
   return (
     <div
       onClick={handleSelectedEmail}
@@ -91,14 +115,22 @@ export default function EmailListItem({
                   email.isRead ? "font-normal" : "font-semibold"
                 }`}
               >
-                {getSenderDisplay()}
+                {isSearchMatch(getSenderDisplay()) ? (
+                  highlightSearchQuery(getSenderDisplay())
+                ) : (
+                  getSenderDisplay()
+                )}
               </span>
               <span
                 className={`text-gray-900  shrink-0 ${
                   email.isRead ? "font-normal" : "font-semibold"
                 }`}
               >
-                {email.title}
+                {isSearchMatch(email.title) ? (
+                  highlightSearchQuery(email.title)
+                ) : (
+                  email.title
+                )}
               </span>
               <span
                 className={`text-gray-500 ${
@@ -112,7 +144,11 @@ export default function EmailListItem({
                   email.isRead ? "font-normal" : "font-semibold"
                 }`}
               >
-                {getPreviewText()}
+                {isSearchMatch(getPreviewText()) ? (
+                  highlightSearchQuery(getPreviewText())
+                ) : (
+                  getPreviewText()
+                )}
               </span>
             </div>
           </div>

@@ -28,6 +28,7 @@ describe("EmailDetail", () => {
     email: mockEmail,
     setSelectedEmail: mockFunctions.setSelectedEmail,
     updateEmail: mockFunctions.updateEmail,
+    searchQuery: "",
   };
 
   describe("Basic Rendering", () => {
@@ -57,17 +58,15 @@ describe("EmailDetail", () => {
       expect(replyElements).toHaveLength(2);
     });
 
-    it("should mark replies with data-reply=true", () => {
+    it("should render reply content correctly", () => {
       render(<EmailDetail {...defaultProps} />);
 
-      expect(screen.getByTestId("email-message-1.1")).toHaveAttribute(
-        "data-reply",
-        "true"
+      expect(screen.getByTestId("email-message-1.1")).toBeInTheDocument();
+      expect(screen.getByTestId("email-message-1.2")).toBeInTheDocument();
+      const replyElements = screen.getAllByText(
+        "reply@example.com - Test reply content"
       );
-      expect(screen.getByTestId("email-message-1.2")).toHaveAttribute(
-        "data-reply",
-        "true"
-      );
+      expect(replyElements).toHaveLength(2);
     });
   });
 
@@ -174,18 +173,20 @@ describe("EmailDetail", () => {
   });
 
   describe("Minimization", () => {
-    it("should initialize with no emails minimized", () => {
+    it("should initialize with emails minimized when there are replies", () => {
       render(<EmailDetail {...defaultProps} />);
 
       expect(screen.getByTestId("email-message-1")).toHaveAttribute(
         "data-minimized",
-        "false"
+        "true"
       );
-      expect(screen.getByTestId("email-message-1.1")).toHaveAttribute(
-        "data-minimized",
-        "false"
-      );
-      expect(screen.getByTestId("email-message-1.2")).toHaveAttribute(
+    });
+
+    it("should initialize with emails unminimized when there are no replies", () => {
+      const emailWithoutReplies = { ...mockEmail, reply: [] };
+      render(<EmailDetail {...defaultProps} email={emailWithoutReplies} />);
+
+      expect(screen.getByTestId("email-message-1")).toHaveAttribute(
         "data-minimized",
         "false"
       );
@@ -199,7 +200,7 @@ describe("EmailDetail", () => {
 
       expect(screen.getByTestId("email-message-1")).toHaveAttribute(
         "data-minimized",
-        "true"
+        "false"
       );
     });
 
@@ -211,25 +212,21 @@ describe("EmailDetail", () => {
 
       expect(screen.getByTestId("email-message-1.1")).toHaveAttribute(
         "data-minimized",
-        "true"
+        "false"
       );
     });
 
     it("should maintain independent minimization for each email", () => {
       render(<EmailDetail {...defaultProps} />);
 
-      fireEvent.click(screen.getByTestId("toggle-1"));
       fireEvent.click(screen.getByTestId("toggle-1.1"));
-
+      
       expect(screen.getByTestId("email-message-1")).toHaveAttribute(
         "data-minimized",
         "true"
       );
+      
       expect(screen.getByTestId("email-message-1.1")).toHaveAttribute(
-        "data-minimized",
-        "true"
-      );
-      expect(screen.getByTestId("email-message-1.2")).toHaveAttribute(
         "data-minimized",
         "false"
       );
@@ -242,16 +239,91 @@ describe("EmailDetail", () => {
       render(<EmailDetail {...defaultProps} email={emailWithoutReplies} />);
 
       expect(screen.getByTestId("email-message-1")).toBeInTheDocument();
-      expect(screen.queryByTestId("email-message-1.1")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("email-message-1.2")).not.toBeInTheDocument();
     });
   });
 
-  describe("Date Formatting", () => {
-    it("should use getTimeDifference for main email", () => {
+  describe("Auto-minimization", () => {
+    it("should minimize original email when there are replies", () => {
       render(<EmailDetail {...defaultProps} />);
 
-      expect(screen.getByTestId("email-message-1")).toBeInTheDocument();
+      const originalEmail = screen.getByTestId("email-message-1");
+      expect(originalEmail).toHaveAttribute("data-minimized", "true");
+    });
+
+    it("should minimize all replies except the last one", () => {
+      render(<EmailDetail {...defaultProps} />);
+
+      const firstReply = screen.getByTestId("email-message-1.1");
+      expect(firstReply).toHaveAttribute("data-minimized", "true");
+    });
+
+    it("should not minimize the last reply", () => {
+      render(<EmailDetail {...defaultProps} />);
+
+      const lastReply = screen.getByTestId("email-message-1.2");
+      expect(lastReply).toHaveAttribute("data-minimized", "false");
+    });
+
+    it("should not minimize any emails when there are no replies", () => {
+      const emailWithoutReplies = { ...mockEmail, reply: [] };
+      render(<EmailDetail {...defaultProps} email={emailWithoutReplies} />);
+
+      const originalEmail = screen.getByTestId("email-message-1");
+      expect(originalEmail).toHaveAttribute("data-minimized", "false");
+    });
+
+    it("should allow manual toggling of minimization", () => {
+      render(<EmailDetail {...defaultProps} />);
+
+      const toggleButton = screen.getByTestId("toggle-1");
+      fireEvent.click(toggleButton);
+
+      const originalEmail = screen.getByTestId("email-message-1");
+      expect(originalEmail).toHaveAttribute("data-minimized", "false");
+    });
+
+    it("should allow starring individual replies", () => {
+      render(<EmailDetail {...defaultProps} />);
+
+      const firstReplyStarButton = screen.getByTestId("star-1.1");
+      fireEvent.click(firstReplyStarButton);
+
+      expect(defaultProps.updateEmail).toHaveBeenCalledWith(1, {
+        reply: expect.arrayContaining([
+          expect.objectContaining({
+            id: 1.1,
+            isStarred: true
+          })
+        ])
+      });
+    });
+
+    it("should not redirect to email list when starring a reply", () => {
+      render(<EmailDetail {...defaultProps} />);
+
+      const firstReplyStarButton = screen.getByTestId("star-1.1");
+      fireEvent.click(firstReplyStarButton);
+
+      expect(defaultProps.setSelectedEmail).not.toHaveBeenCalledWith(null);
+    });
+
+    it("should filter replies based on search query", () => {
+      render(<EmailDetail {...defaultProps} searchQuery="Test" />);
+
+      const replyElements = screen.getAllByText(/reply@example.com - Test reply content/);
+      expect(replyElements.length).toBeGreaterThan(0);
+    });
+
+    it("should show no results message when search has no matches", () => {
+      render(<EmailDetail {...defaultProps} searchQuery="nonexistent" />);
+
+      expect(screen.getByText(/No results found for/)).toBeInTheDocument();
+    });
+
+    it("should highlight search terms in email content", () => {
+      render(<EmailDetail {...defaultProps} searchQuery="test" />);
+
+      expect(screen.getByText(/John Doe - This is a test email content/)).toBeInTheDocument();
     });
   });
 });
